@@ -85,11 +85,11 @@ export default async function AdminDashboardPage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/admin/rounds"
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xs tracking-wider flex items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all"
+              href="/admin/participants"
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs tracking-wider flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all"
             >
-              <PlayCircle className="w-4 h-4" />
-              <span>ROUND CONTROLS</span>
+              <Users className="w-4 h-4" />
+              <span>VIEW PARTICIPANTS</span>
             </Link>
 
             <Link
@@ -191,15 +191,11 @@ export default async function AdminDashboardPage() {
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <PlayCircle className="w-4 h-4 text-cyan-400" />
-                Active Rounds Status
+                Competition Rounds Lifecycle
               </h2>
-              <Link
-                href="/admin/rounds"
-                className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-              >
-                <span>Manage Controls</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-bold tracking-wider">
+                ● AUTOPILOT ACTIVE
+              </span>
             </div>
 
             <div className="space-y-3">

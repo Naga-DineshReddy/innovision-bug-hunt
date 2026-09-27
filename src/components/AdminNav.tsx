@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Participants", href: "/admin/participants", icon: Users },
   { label: "Questions", href: "/admin/questions", icon: Code2 },
-  { label: "Rounds Control", href: "/admin/rounds", icon: PlayCircle },
   { label: "Submissions", href: "/admin/submissions", icon: FileCheck2 },
   { label: "Results & Finalists", href: "/admin/results", icon: Award },
   { label: "Leaderboard", href: "/admin/leaderboard", icon: Trophy },
