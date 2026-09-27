@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AdminNav } from "@/components/AdminNav";
 import { Participant } from "@/types";
 import { Trophy, Download, Printer, ArrowUpDown, Award, CheckCircle2 } from "lucide-react";
@@ -10,25 +10,48 @@ export default function AdminLeaderboardPage() {
   const [sortAsc, setSortAsc] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/admin/participants");
-        const data = await res.json();
-        if (data.participants) {
-          setParticipants(data.participants);
-        }
-      } catch {
-        // ignore
-      } finally {
-        setLoading(false);
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/participants");
+      const data = await res.json();
+      if (data.participants) {
+        setParticipants(data.participants);
       }
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
     }
-    load();
   }, []);
 
+  useEffect(() => {
+    load();
+    const interval = setInterval(load, 4000); // 4-second live auto-refresh
+    return () => clearInterval(interval);
+  }, [load]);
+
+  // Accurate multi-criteria ranking & tie-breaker:
+  // 1. Total Score (desc)
+  // 2. Round 3 Score (Hardest round)
+  // 3. Round 2 Score (Moderate)
+  // 4. Tie-Breaker Points
+  // 5. Earlier submission timestamp (Speed tie-break)
   const sorted = [...participants].sort((a, b) => {
-    return sortAsc ? a.total_score - b.total_score : b.total_score - a.total_score;
+    if (a.total_score !== b.total_score) {
+      return sortAsc ? a.total_score - b.total_score : b.total_score - a.total_score;
+    }
+    if (b.round_3_score !== a.round_3_score) {
+      return b.round_3_score - a.round_3_score;
+    }
+    if (b.round_2_score !== a.round_2_score) {
+      return b.round_2_score - a.round_2_score;
+    }
+    if (b.tie_breaker_score !== a.tie_breaker_score) {
+      return b.tie_breaker_score - a.tie_breaker_score;
+    }
+    const timeA = new Date(a.round_3_submitted_at || a.last_active_at || 0).getTime();
+    const timeB = new Date(b.round_3_submitted_at || b.last_active_at || 0).getTime();
+    return timeA - timeB;
   });
 
   // Export to CSV
@@ -92,6 +115,10 @@ export default function AdminLeaderboardPage() {
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">
                 ADMIN CONFIDENTIAL
+              </span>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-bold tracking-wider animate-pulse flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                LIVE UPDATING (4s)
               </span>
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
