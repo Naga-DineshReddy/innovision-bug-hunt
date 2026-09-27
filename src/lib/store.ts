@@ -481,12 +481,64 @@ export async function submitQuestionCode(params: {
     await updateParticipant(participant.registration_id, {
       [scoreField]: roundScore
     });
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from("submissions").insert({
+          registration_id: submission.participant_id,
+          student_name: submission.student_name,
+          round_id: submission.round_id,
+          question_id: submission.question_id,
+          submitted_code: submission.submitted_code,
+          tests_passed: evalResult.testResults.filter((t) => t.passed).length,
+          total_tests: evalResult.testResults.length,
+          score: submission.score,
+          submitted_at: submission.submitted_at
+        });
+      } catch (e) {
+        console.warn("Supabase submission insert fallback:", e);
+      }
+    }
   }
 
   return { submission, evalResult };
 }
 
 export async function getSubmissions(participantId?: string): Promise<Submission[]> {
+  if (isSupabaseConfigured && supabaseAdmin) {
+    try {
+      let query = supabaseAdmin
+        .from("submissions")
+        .select("*")
+        .order("submitted_at", { ascending: false })
+        .limit(100);
+
+      if (participantId) {
+        query = query.ilike("registration_id", participantId.trim());
+      }
+
+      const { data, error } = await query;
+      if (!error && data && data.length > 0) {
+        return data.map((d: any) => ({
+          id: d.id,
+          participant_id: d.registration_id,
+          student_name: d.student_name,
+          question_id: d.question_id,
+          question_title: d.question_id,
+          round_id: d.round_id,
+          submitted_code: d.submitted_code,
+          score: d.score,
+          test_results: [],
+          status: d.score > 0 ? "correct" : "incorrect",
+          submitted_at: d.submitted_at,
+          execution_time_ms: 22
+        }));
+      }
+    } catch (e) {
+      console.warn("Supabase fetch submissions fallback:", e);
+    }
+  }
+
   const store = getStore();
   let subs = [...store.submissions];
   if (participantId) {
