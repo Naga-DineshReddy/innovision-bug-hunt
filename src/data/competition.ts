@@ -5,7 +5,7 @@ export const INITIAL_ROUNDS: RoundInfo[] = [
     round_number: 1,
     name: "ROUND 1",
     subtitle: "EASY: BUG HUNT BASICS",
-    duration_minutes: 5,
+    duration_minutes: 10,
     total_questions: 8,
     total_marks: 20,
     status: "LIVE"
@@ -23,7 +23,7 @@ export const INITIAL_ROUNDS: RoundInfo[] = [
     round_number: 3,
     name: "ROUND 3",
     subtitle: "HARD: FINAL BUG HUNT",
-    duration_minutes: 15,
+    duration_minutes: 10,
     total_questions: 3,
     total_marks: 50,
     status: "READY"
@@ -50,14 +50,14 @@ export const INITIAL_SETTINGS: CompetitionSettings = {
     {
       id: "ann-1",
       title: "Welcome to INNOVISION BUG HUNT 2026",
-      message: "Competition Schedule: Round 1 (5 mins) → Round 2 (10 mins) → Round 3 (15 mins). All registered students participate in all three rounds!",
+      message: "Competition Schedule: Round 1 (10 mins) → Round 2 (10 mins) → Round 3 (10 mins). All registered students participate in all three rounds!",
       timestamp: "3:00 PM",
       is_urgent: false
     },
     {
       id: "ann-2",
       title: "Round 1 (Easy) is LIVE",
-      message: "Duration: 5 minutes • 8 questions • 20 marks. At the deadline, Round 1 auto-submits and Round 2 unlocks automatically.",
+      message: "Duration: 10 minutes • 8 questions • 20 marks. At the deadline, Round 1 auto-submits and Round 2 unlocks automatically.",
       timestamp: "3:00 PM",
       is_urgent: true
     }

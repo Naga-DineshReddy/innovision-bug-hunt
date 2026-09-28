@@ -34,7 +34,7 @@ export default async function FinalRoundPage() {
 
   const rounds = await getRounds();
   const finalRound = rounds.find((r) => r.round_number === 3);
-  const durationMinutes = finalRound?.duration_minutes ?? 15;
+  const durationMinutes = finalRound?.duration_minutes ?? 10;
 
   const questions = await getQuestionsForRound(3, true);
 
