@@ -221,15 +221,15 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Average Score */}
-          <div className="p-4 rounded-xl bg-gradient-to-tr from-cyan-950/60 to-purple-950/60 border border-cyan-500/40">
+          <div className="p-4 rounded-xl bg-[#0a0f1e]/80 border border-cyan-500/20 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] text-cyan-300 uppercase font-bold">Average Score</span>
-              <Activity className="w-4 h-4 text-cyan-400" />
+              <span className="text-[11px] text-cyan-700 uppercase font-bold">Average Score</span>
+              <Activity className="w-4 h-4 text-cyan-600" />
             </div>
-            <span className="text-2xl sm:text-3xl font-extrabold text-white">
+            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               {loading ? "..." : metrics.averageScore}
             </span>
-            <span className="block text-[10px] text-cyan-400/80 mt-1">Out of 100 Marks</span>
+            <span className="block text-[10px] text-cyan-700 font-semibold mt-1">Out of 100 Marks</span>
           </div>
         </div>
 

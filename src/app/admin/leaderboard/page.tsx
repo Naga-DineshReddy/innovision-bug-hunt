@@ -161,52 +161,52 @@ export default function AdminLeaderboardPage() {
         {sorted.length >= 3 && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Rank 2 */}
-            <div className="p-5 rounded-2xl bg-[#0a0f1e]/90 border border-slate-700 text-center flex flex-col justify-between order-2 sm:order-1">
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm text-center flex flex-col justify-between order-2 sm:order-1 hover:shadow-md transition-all">
               <div>
-                <span className="w-10 h-10 rounded-full bg-slate-800 border border-slate-600 text-slate-200 font-extrabold text-sm mx-auto flex items-center justify-center mb-2">
+                <span className="w-10 h-10 rounded-full bg-slate-100 border border-slate-300 text-slate-700 font-extrabold text-sm mx-auto flex items-center justify-center mb-2">
                   2
                 </span>
-                <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
+                <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-bold">
                   1st Runner Up
                 </span>
-                <h3 className="text-base font-bold text-white mt-1">{sorted[1].student_name}</h3>
-                <span className="text-xs text-cyan-300">{sorted[1].registration_id}</span>
+                <h3 className="text-base font-bold text-slate-900 mt-1">{sorted[1].student_name}</h3>
+                <span className="text-xs text-cyan-700 font-semibold">{sorted[1].registration_id}</span>
               </div>
-              <div className="mt-4 pt-3 border-t border-slate-800 text-sm font-bold text-slate-200">
+              <div className="mt-4 pt-3 border-t border-slate-100 text-sm font-bold text-slate-800">
                 {sorted[1].total_score} Marks
               </div>
             </div>
 
-            {/* Rank 1 */}
-            <div className="p-6 rounded-2xl bg-gradient-to-b from-amber-950/40 via-[#0a0f1e]/95 to-[#0a0f1e]/95 border-2 border-amber-400/80 shadow-[0_0_30px_rgba(251,191,36,0.2)] text-center flex flex-col justify-between order-1 sm:order-2">
+            {/* Rank 1: Bug Hunt Champion */}
+            <div className="p-6 rounded-2xl bg-gradient-to-b from-amber-50/80 via-white to-white border-2 border-amber-400 shadow-md text-center flex flex-col justify-between order-1 sm:order-2 hover:shadow-xl transition-all">
               <div>
-                <div className="w-12 h-12 rounded-full bg-amber-400 text-black font-extrabold text-lg mx-auto flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(251,191,36,0.6)]">
+                <div className="w-12 h-12 rounded-full bg-amber-400 text-slate-900 font-extrabold text-lg mx-auto flex items-center justify-center mb-2 shadow-sm">
                   👑 1
                 </div>
-                <span className="text-[10px] text-amber-400 font-bold uppercase tracking-widest block">
+                <span className="text-xs text-amber-700 font-extrabold uppercase tracking-widest block">
                   BUG HUNT CHAMPION
                 </span>
-                <h3 className="text-lg font-bold text-white mt-1">{sorted[0].student_name}</h3>
-                <span className="text-xs text-cyan-300">{sorted[0].registration_id}</span>
+                <h3 className="text-lg font-extrabold text-slate-900 mt-1">{sorted[0].student_name}</h3>
+                <span className="text-xs text-cyan-700 font-bold">{sorted[0].registration_id}</span>
               </div>
-              <div className="mt-4 pt-3 border-t border-amber-500/30 text-lg font-extrabold text-amber-300">
+              <div className="mt-4 pt-3 border-t border-amber-200 text-lg font-extrabold text-amber-800">
                 {sorted[0].total_score} / 100 Marks
               </div>
             </div>
 
             {/* Rank 3 */}
-            <div className="p-5 rounded-2xl bg-[#0a0f1e]/90 border border-amber-900/60 text-center flex flex-col justify-between order-3">
+            <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm text-center flex flex-col justify-between order-3 hover:shadow-md transition-all">
               <div>
-                <span className="w-10 h-10 rounded-full bg-amber-950 border border-amber-700 text-amber-400 font-extrabold text-sm mx-auto flex items-center justify-center mb-2">
+                <span className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-extrabold text-sm mx-auto flex items-center justify-center mb-2">
                   3
                 </span>
-                <span className="text-[10px] text-amber-600 uppercase tracking-wider block">
+                <span className="text-[10px] text-amber-700 uppercase tracking-wider block font-bold">
                   2nd Runner Up
                 </span>
-                <h3 className="text-base font-bold text-white mt-1">{sorted[2].student_name}</h3>
-                <span className="text-xs text-cyan-300">{sorted[2].registration_id}</span>
+                <h3 className="text-base font-bold text-slate-900 mt-1">{sorted[2].student_name}</h3>
+                <span className="text-xs text-cyan-700 font-semibold">{sorted[2].registration_id}</span>
               </div>
-              <div className="mt-4 pt-3 border-t border-slate-800 text-sm font-bold text-slate-200">
+              <div className="mt-4 pt-3 border-t border-slate-100 text-sm font-bold text-slate-800">
                 {sorted[2].total_score} Marks
               </div>
             </div>
@@ -214,11 +214,11 @@ export default function AdminLeaderboardPage() {
         )}
 
         {/* Full Table */}
-        <div className="rounded-2xl border border-cyan-500/20 bg-[#0a0f1e]/80 overflow-hidden shadow-xl">
+        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 bg-[#070b16] text-[11px] uppercase text-slate-400">
+                <tr className="border-b border-slate-200 bg-slate-50 text-[11px] uppercase text-slate-600 font-bold">
                   <th className="py-3 px-4 text-center">Rank</th>
                   <th className="py-3 px-4">Registration ID</th>
                   <th className="py-3 px-4">Participant Name</th>
@@ -226,36 +226,36 @@ export default function AdminLeaderboardPage() {
                   <th className="py-3 px-4 text-center">Round 2 (30m)</th>
                   <th className="py-3 px-4 text-center">Round 3 (50m)</th>
                   <th className="py-3 px-4 text-center">Tie Break</th>
-                  <th className="py-3 px-4 text-center font-bold text-white">Total</th>
+                  <th className="py-3 px-4 text-center font-bold text-slate-900">Total</th>
                   <th className="py-3 px-4 text-center">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-slate-100 text-slate-700">
                 {sorted.map((p, idx) => (
-                  <tr key={p.registration_id} className="hover:bg-slate-900/40">
-                    <td className="py-3 px-4 text-center font-bold text-slate-400">
+                  <tr key={p.registration_id} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-3 px-4 text-center font-bold text-slate-500">
                       {idx + 1}
                     </td>
-                    <td className="py-3 px-4 font-bold text-cyan-300">
+                    <td className="py-3 px-4 font-bold text-cyan-700">
                       {p.registration_id}
                     </td>
-                    <td className="py-3 px-4 text-white font-semibold">
+                    <td className="py-3 px-4 text-slate-900 font-bold">
                       {p.student_name}
                       {p.is_finalist && (
-                        <span className="ml-2 text-[10px] text-purple-400 font-bold">
+                        <span className="ml-2 text-[10px] text-purple-700 font-bold bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
                           [Finalist]
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-center text-cyan-400">{p.round_1_score}</td>
-                    <td className="py-3 px-4 text-center text-blue-400">{p.round_2_score}</td>
-                    <td className="py-3 px-4 text-center text-purple-400">{p.round_3_score}</td>
-                    <td className="py-3 px-4 text-center text-amber-300">+{p.tie_breaker_score}</td>
-                    <td className="py-3 px-4 text-center font-bold text-white text-sm">
+                    <td className="py-3 px-4 text-center text-cyan-700 font-medium">{p.round_1_score}</td>
+                    <td className="py-3 px-4 text-center text-blue-700 font-medium">{p.round_2_score}</td>
+                    <td className="py-3 px-4 text-center text-purple-700 font-medium">{p.round_3_score}</td>
+                    <td className="py-3 px-4 text-center text-amber-700 font-medium">+{p.tie_breaker_score}</td>
+                    <td className="py-3 px-4 text-center font-extrabold text-slate-900 text-sm">
                       {p.total_score}
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <span className="text-[10px] uppercase font-bold text-slate-400">
+                      <span className="text-[10px] uppercase font-bold text-slate-500">
                         {p.status}
                       </span>
                     </td>
