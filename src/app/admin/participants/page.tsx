@@ -129,40 +129,40 @@ export default function AdminParticipantsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-              <Users className="w-6 h-6 text-cyan-400" />
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <Users className="w-6 h-6 text-cyan-600" />
               Live Participant Monitor &amp; Controls
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
-              Active monitoring for 80 registered terminals in LAB 4-A with realtime status updates.
+            <p className="text-xs text-slate-500 mt-1">
+              Active monitoring for all {participants.length} registered terminals in LAB 4-A with realtime status updates.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={fetchParticipants}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs text-slate-300 flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-xs text-slate-700 flex items-center gap-1.5 shadow-sm transition-all"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
               <span>Refresh</span>
             </button>
-            <span className="text-xs text-emerald-400 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-xs text-emerald-700 font-bold flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               Live Feed
             </span>
           </div>
         </div>
 
         {/* Search & Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-[#0a0f1e]/90 border border-cyan-500/20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
               type="text"
               placeholder="Search by Name or Registration ID..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-lg bg-[#060913] border border-slate-800 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-400"
+              className="w-full pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-cyan-500 focus:bg-white"
             />
           </div>
 
@@ -170,7 +170,7 @@ export default function AdminParticipantsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-[#060913] border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-cyan-400"
+              className="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-cyan-500 focus:bg-white"
             >
               <option value="ALL">All Statuses ({participants.length})</option>
               <option value="LOGGED_IN">Logged In</option>
@@ -186,7 +186,7 @@ export default function AdminParticipantsPage() {
             <select
               value={roundFilter}
               onChange={(e) => setRoundFilter(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-[#060913] border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-cyan-400"
+              className="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-cyan-500 focus:bg-white"
             >
               <option value="ALL">All Rounds</option>
               <option value="1">Round 1 (Basics)</option>
@@ -197,11 +197,11 @@ export default function AdminParticipantsPage() {
         </div>
 
         {/* Live Table */}
-        <div className="rounded-2xl border border-cyan-500/20 bg-[#0a0f1e]/80 overflow-hidden shadow-xl">
+        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 bg-[#070b16] text-[11px] uppercase text-slate-400">
+                <tr className="border-b border-slate-200 bg-slate-50 text-[11px] uppercase text-slate-600 font-bold">
                   <th className="py-3 px-4">Reg ID</th>
                   <th className="py-3 px-4">Participant Name</th>
                   <th className="py-3 px-4">Status</th>
@@ -209,24 +209,24 @@ export default function AdminParticipantsPage() {
                   <th className="py-3 px-4 text-center">R1</th>
                   <th className="py-3 px-4 text-center">R2</th>
                   <th className="py-3 px-4 text-center">R3</th>
-                  <th className="py-3 px-4 text-center">Total</th>
+                  <th className="py-3 px-4 text-center font-bold text-slate-900">Total</th>
                   <th className="py-3 px-4 text-center">Signals</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-slate-100 text-slate-700">
                 {filtered.map((p) => {
                   return (
                     <tr
                       key={p.registration_id}
-                      className="hover:bg-slate-900/40 transition-colors"
+                      className="hover:bg-slate-50 transition-colors"
                     >
-                      <td className="py-3 px-4 font-bold text-cyan-300">
+                      <td className="py-3 px-4 font-bold text-cyan-700">
                         {p.registration_id}
                       </td>
 
                       <td className="py-3 px-4">
-                        <div className="font-semibold text-white">{p.student_name}</div>
+                        <div className="font-semibold text-slate-900">{p.student_name}</div>
                         <div className="text-[10px] text-slate-500">{p.email}</div>
                       </td>
 
@@ -234,36 +234,36 @@ export default function AdminParticipantsPage() {
                         <span
                           className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${
                             p.status === "IN_PROGRESS"
-                              ? "bg-cyan-950 text-cyan-300 border-cyan-500/40 animate-pulse"
+                              ? "bg-cyan-50 text-cyan-700 border-cyan-200 animate-pulse"
                               : p.status === "LOGGED_IN"
-                              ? "bg-emerald-950 text-emerald-300 border-emerald-500/40"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                               : p.status === "COMPLETED"
-                              ? "bg-blue-950 text-blue-300 border-blue-500/40"
+                              ? "bg-blue-50 text-blue-700 border-blue-200"
                               : p.status === "DISQUALIFIED"
-                              ? "bg-red-950 text-red-300 border-red-500/50"
+                              ? "bg-red-50 text-red-700 border-red-200"
                               : p.status === "LOCKED"
-                              ? "bg-amber-950 text-amber-300 border-amber-500/50"
-                              : "bg-slate-900 text-slate-500 border-slate-800"
+                              ? "bg-amber-50 text-amber-700 border-amber-200"
+                              : "bg-slate-100 text-slate-600 border-slate-200"
                           }`}
                         >
                           {p.status}
                         </span>
                       </td>
 
-                      <td className="py-3 px-4 text-slate-400">
+                      <td className="py-3 px-4 text-slate-600">
                         Round {p.current_round}
                         {p.is_finalist && (
-                          <span className="ml-1 text-[10px] text-purple-400 font-bold">
+                          <span className="ml-1 text-[10px] text-purple-700 font-bold bg-purple-50 px-1 py-0.5 rounded border border-purple-200">
                             [Finalist]
                           </span>
                         )}
                       </td>
 
-                      <td className="py-3 px-4 text-center text-cyan-400">{p.round_1_score}</td>
-                      <td className="py-3 px-4 text-center text-blue-400">{p.round_2_score}</td>
-                      <td className="py-3 px-4 text-center text-purple-400">{p.round_3_score}</td>
+                      <td className="py-3 px-4 text-center text-cyan-700 font-semibold">{p.round_1_score}</td>
+                      <td className="py-3 px-4 text-center text-blue-700 font-semibold">{p.round_2_score}</td>
+                      <td className="py-3 px-4 text-center text-purple-700 font-semibold">{p.round_3_score}</td>
 
-                      <td className="py-3 px-4 text-center font-bold text-white text-sm">
+                      <td className="py-3 px-4 text-center font-extrabold text-slate-900 text-sm">
                         {p.total_score != null && !isNaN(Number(p.total_score)) && Number(p.total_score) > 0
                           ? Number(p.total_score)
                           : (Number(p.round_1_score) || 0) + (Number(p.round_2_score) || 0) + (Number(p.round_3_score) || 0) + (Number(p.tie_breaker_score) || 0)}
@@ -271,11 +271,11 @@ export default function AdminParticipantsPage() {
 
                       <td className="py-3 px-4 text-center">
                         {p.suspicious_count > 0 ? (
-                          <span className="px-2 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-500/40 text-[10px] font-bold">
+                          <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">
                             {p.suspicious_count} Flag{p.suspicious_count > 1 ? "s" : ""}
                           </span>
                         ) : (
-                          <span className="text-slate-600 text-[10px]">Clean</span>
+                          <span className="text-slate-400 text-[10px]">Clean</span>
                         )}
                       </td>
 
@@ -303,7 +303,7 @@ export default function AdminParticipantsPage() {
                             <button
                               onClick={() => handleAction(p.registration_id, "UNLOCK")}
                               title="Unlock Session"
-                              className="p-1 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-400 border border-emerald-500/30"
+                              className="p-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300"
                             >
                               <Unlock className="w-3.5 h-3.5" />
                             </button>
@@ -311,7 +311,7 @@ export default function AdminParticipantsPage() {
                             <button
                               onClick={() => handleAction(p.registration_id, "LOCK", "Coordinator Lock")}
                               title="Lock Session"
-                              className="p-1 rounded bg-slate-800 hover:bg-amber-950 hover:text-amber-400 text-slate-400"
+                              className="p-1 rounded bg-slate-100 hover:bg-amber-50 hover:text-amber-700 text-slate-600 border border-slate-200"
                             >
                               <Lock className="w-3.5 h-3.5" />
                             </button>
@@ -322,7 +322,7 @@ export default function AdminParticipantsPage() {
                             <button
                               onClick={() => handleAction(p.registration_id, "RESTORE")}
                               title="Restore Participant"
-                              className="p-1 rounded bg-slate-800 hover:bg-emerald-900 text-emerald-400"
+                              className="p-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300"
                             >
                               <RotateCcw className="w-3.5 h-3.5" />
                             </button>
@@ -330,7 +330,7 @@ export default function AdminParticipantsPage() {
                             <button
                               onClick={() => handleAction(p.registration_id, "DISQUALIFY", "Compliance Violation")}
                               title="Disqualify Participant"
-                              className="p-1 rounded bg-slate-800 hover:bg-red-950 hover:text-red-400 text-slate-400"
+                              className="p-1 rounded bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-600 border border-slate-200"
                             >
                               <ShieldAlert className="w-3.5 h-3.5" />
                             </button>
@@ -344,7 +344,7 @@ export default function AdminParticipantsPage() {
             </table>
           </div>
 
-          <div className="p-3 bg-[#070b16] border-t border-slate-800 text-[11px] text-slate-500 flex justify-between">
+          <div className="p-3 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-500 flex justify-between">
             <span>Showing {filtered.length} of {participants.length} total participants</span>
             <span>Refreshes automatically every 5 seconds</span>
           </div>
