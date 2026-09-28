@@ -34,7 +34,17 @@ export async function GET() {
   const submittedCount = participants.filter(
     (p) => p.status === "SUBMITTED" || p.status === "COMPLETED"
   ).length;
-  const totalScoresSum = participants.reduce((acc, p) => acc + p.total_score, 0);
+  const totalScoresSum = participants.reduce((acc, p) => {
+    const r1 = Number(p.round_1_score) || 0;
+    const r2 = Number(p.round_2_score) || 0;
+    const r3 = Number(p.round_3_score) || 0;
+    const tb = Number(p.tie_breaker_score) || 0;
+    const score =
+      p.total_score != null && !isNaN(Number(p.total_score)) && Number(p.total_score) > 0
+        ? Number(p.total_score)
+        : r1 + r2 + r3 + tb;
+    return acc + score;
+  }, 0);
   const averageScore =
     totalRegistered > 0 ? (totalScoresSum / totalRegistered).toFixed(1) : "0.0";
   const suspiciousSignalsCount = participants.reduce(

@@ -264,7 +264,9 @@ export default function AdminParticipantsPage() {
                       <td className="py-3 px-4 text-center text-purple-400">{p.round_3_score}</td>
 
                       <td className="py-3 px-4 text-center font-bold text-white text-sm">
-                        {p.total_score}
+                        {p.total_score != null && !isNaN(Number(p.total_score)) && Number(p.total_score) > 0
+                          ? Number(p.total_score)
+                          : (Number(p.round_1_score) || 0) + (Number(p.round_2_score) || 0) + (Number(p.round_3_score) || 0) + (Number(p.tie_breaker_score) || 0)}
                       </td>
 
                       <td className="py-3 px-4 text-center">

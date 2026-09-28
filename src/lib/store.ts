@@ -93,12 +93,26 @@ export async function verifyRegistrationId(regId: string): Promise<Participant |
           .maybeSingle();
 
         if (sessionData) {
+          const r1 = Number(sessionData.round_1_score) || 0;
+          const r2 = Number(sessionData.round_2_score) || 0;
+          const r3 = Number(sessionData.round_3_score) || 0;
+          const tb = Number(sessionData.tie_breaker_score) || 0;
+          const total =
+            sessionData.total_score != null && !isNaN(Number(sessionData.total_score)) && Number(sessionData.total_score) > 0
+              ? Number(sessionData.total_score)
+              : r1 + r2 + r3 + tb;
+
           const participantObj: Participant = {
             ...(sessionData as Participant),
             student_name: sessionData.student_name || studentName,
             email: sessionData.email || email,
             department: department,
-            event: "BUG HUNT"
+            event: "BUG HUNT",
+            round_1_score: r1,
+            round_2_score: r2,
+            round_3_score: r3,
+            tie_breaker_score: tb,
+            total_score: total
           };
           const store = getStore();
           store.participants.set(cleanId, participantObj);
@@ -197,11 +211,25 @@ export async function getAllParticipants(): Promise<Participant[]> {
           const department = member?.department || "Artificial Intelligence and Data Science";
 
           if (session) {
+            const r1 = Number(session.round_1_score) || 0;
+            const r2 = Number(session.round_2_score) || 0;
+            const r3 = Number(session.round_3_score) || 0;
+            const tb = Number(session.tie_breaker_score) || 0;
+            const total =
+              session.total_score != null && !isNaN(Number(session.total_score)) && Number(session.total_score) > 0
+                ? Number(session.total_score)
+                : r1 + r2 + r3 + tb;
+
             return {
               ...session,
               student_name: session.student_name || studentName,
               email: session.email || email,
-              department: session.department || department
+              department: session.department || department,
+              round_1_score: r1,
+              round_2_score: r2,
+              round_3_score: r3,
+              tie_breaker_score: tb,
+              total_score: total
             };
           }
 
@@ -266,14 +294,20 @@ export async function updateParticipant(
 
   if (!existing) return null;
 
+  const r1 = Number(updates.round_1_score !== undefined ? updates.round_1_score : existing.round_1_score) || 0;
+  const r2 = Number(updates.round_2_score !== undefined ? updates.round_2_score : existing.round_2_score) || 0;
+  const r3 = Number(updates.round_3_score !== undefined ? updates.round_3_score : existing.round_3_score) || 0;
+  const tb = Number(updates.tie_breaker_score !== undefined ? updates.tie_breaker_score : existing.tie_breaker_score) || 0;
+  const total = updates.total_score !== undefined && !isNaN(Number(updates.total_score)) ? Number(updates.total_score) : (r1 + r2 + r3 + tb);
+
   const updated: Participant = {
     ...existing,
     ...updates,
-    total_score:
-      (updates.round_1_score !== undefined ? updates.round_1_score : existing.round_1_score) +
-      (updates.round_2_score !== undefined ? updates.round_2_score : existing.round_2_score) +
-      (updates.round_3_score !== undefined ? updates.round_3_score : existing.round_3_score) +
-      (updates.tie_breaker_score !== undefined ? updates.tie_breaker_score : existing.tie_breaker_score),
+    round_1_score: r1,
+    round_2_score: r2,
+    round_3_score: r3,
+    tie_breaker_score: tb,
+    total_score: total,
     last_active_at: new Date().toISOString()
   };
 

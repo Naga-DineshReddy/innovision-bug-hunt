@@ -48,12 +48,27 @@ export default function AdminResultsPage() {
     fetchParticipants();
   }, [fetchParticipants]);
 
+  const getParticipantTotal = (p: Participant) => {
+    const r1 = Number(p.round_1_score) || 0;
+    const r2 = Number(p.round_2_score) || 0;
+    const r3 = Number(p.round_3_score) || 0;
+    const tb = Number(p.tie_breaker_score) || 0;
+    const computed = r1 + r2 + r3 + tb;
+    return p.total_score != null && !isNaN(Number(p.total_score)) && Number(p.total_score) > 0
+      ? Number(p.total_score)
+      : computed;
+  };
+
   // Sort participants by Total Score descending (and R1+R2 score as tie-break)
   const ranked = [...participants].sort((a, b) => {
-    if (b.total_score !== a.total_score) {
-      return b.total_score - a.total_score;
+    const scoreA = getParticipantTotal(a);
+    const scoreB = getParticipantTotal(b);
+    if (scoreB !== scoreA) {
+      return scoreB - scoreA;
     }
-    return (b.round_1_score + b.round_2_score) - (a.round_1_score + a.round_2_score);
+    const r12A = (Number(a.round_1_score) || 0) + (Number(a.round_2_score) || 0);
+    const r12B = (Number(b.round_1_score) || 0) + (Number(b.round_2_score) || 0);
+    return r12B - r12A;
   });
 
   // Toggle individual finalist checkbox
@@ -225,7 +240,7 @@ export default function AdminResultsPage() {
                       <td className="py-3 px-4 text-center text-amber-300">+{p.tie_breaker_score}</td>
 
                       <td className="py-3 px-4 text-center font-bold text-white text-base">
-                        {p.total_score}
+                        {getParticipantTotal(p)}
                       </td>
 
                       <td className="py-3 px-4 text-center">

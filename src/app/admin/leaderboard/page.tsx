@@ -30,6 +30,17 @@ export default function AdminLeaderboardPage() {
     return () => clearInterval(interval);
   }, [load]);
 
+  const getParticipantTotal = (p: Participant) => {
+    const r1 = Number(p.round_1_score) || 0;
+    const r2 = Number(p.round_2_score) || 0;
+    const r3 = Number(p.round_3_score) || 0;
+    const tb = Number(p.tie_breaker_score) || 0;
+    const computed = r1 + r2 + r3 + tb;
+    return p.total_score != null && !isNaN(Number(p.total_score)) && Number(p.total_score) > 0
+      ? Number(p.total_score)
+      : computed;
+  };
+
   // Accurate multi-criteria ranking & tie-breaker:
   // 1. Total Score (desc)
   // 2. Round 3 Score (Hardest round)
@@ -37,20 +48,26 @@ export default function AdminLeaderboardPage() {
   // 4. Tie-Breaker Points
   // 5. Earlier submission timestamp (Speed tie-break)
   const sorted = [...participants].sort((a, b) => {
-    if (a.total_score !== b.total_score) {
-      return sortAsc ? a.total_score - b.total_score : b.total_score - a.total_score;
+    const scoreA = getParticipantTotal(a);
+    const scoreB = getParticipantTotal(b);
+
+    if (scoreA !== scoreB) {
+      return sortAsc ? scoreA - scoreB : scoreB - scoreA;
     }
-    if (b.round_3_score !== a.round_3_score) {
-      return b.round_3_score - a.round_3_score;
-    }
-    if (b.round_2_score !== a.round_2_score) {
-      return b.round_2_score - a.round_2_score;
-    }
-    if (b.tie_breaker_score !== a.tie_breaker_score) {
-      return b.tie_breaker_score - a.tie_breaker_score;
-    }
-    const timeA = new Date(a.round_3_submitted_at || a.last_active_at || 0).getTime();
-    const timeB = new Date(b.round_3_submitted_at || b.last_active_at || 0).getTime();
+    const r3A = Number(a.round_3_score) || 0;
+    const r3B = Number(b.round_3_score) || 0;
+    if (r3B !== r3A) return r3B - r3A;
+
+    const r2A = Number(a.round_2_score) || 0;
+    const r2B = Number(b.round_2_score) || 0;
+    if (r2B !== r2A) return r2B - r2A;
+
+    const tbA = Number(a.tie_breaker_score) || 0;
+    const tbB = Number(b.tie_breaker_score) || 0;
+    if (tbB !== tbA) return tbB - tbA;
+
+    const timeA = new Date(a.round_3_submitted_at || a.last_active_at || 0).getTime() || 0;
+    const timeB = new Date(b.round_3_submitted_at || b.last_active_at || 0).getTime() || 0;
     return timeA - timeB;
   });
 
@@ -79,7 +96,7 @@ export default function AdminLeaderboardPage() {
       p.round_2_score,
       p.round_3_score,
       p.tie_breaker_score,
-      p.total_score,
+      getParticipantTotal(p),
       p.is_finalist ? "Yes" : "No",
       p.status
     ]);
@@ -173,7 +190,7 @@ export default function AdminLeaderboardPage() {
                 <span className="text-xs text-cyan-700 font-semibold">{sorted[1].registration_id}</span>
               </div>
               <div className="mt-4 pt-3 border-t border-slate-100 text-sm font-bold text-slate-800">
-                {sorted[1].total_score} Marks
+                {getParticipantTotal(sorted[1])} Marks
               </div>
             </div>
 
@@ -190,7 +207,7 @@ export default function AdminLeaderboardPage() {
                 <span className="text-xs text-cyan-700 font-bold">{sorted[0].registration_id}</span>
               </div>
               <div className="mt-4 pt-3 border-t border-amber-200 text-lg font-extrabold text-amber-800">
-                {sorted[0].total_score} / 100 Marks
+                {getParticipantTotal(sorted[0])} / 100 Marks
               </div>
             </div>
 
@@ -207,7 +224,7 @@ export default function AdminLeaderboardPage() {
                 <span className="text-xs text-cyan-700 font-semibold">{sorted[2].registration_id}</span>
               </div>
               <div className="mt-4 pt-3 border-t border-slate-100 text-sm font-bold text-slate-800">
-                {sorted[2].total_score} Marks
+                {getParticipantTotal(sorted[2])} Marks
               </div>
             </div>
           </div>
@@ -252,7 +269,7 @@ export default function AdminLeaderboardPage() {
                     <td className="py-3 px-4 text-center text-purple-700 font-medium">{p.round_3_score}</td>
                     <td className="py-3 px-4 text-center text-amber-700 font-medium">+{p.tie_breaker_score}</td>
                     <td className="py-3 px-4 text-center font-extrabold text-slate-900 text-sm">
-                      {p.total_score}
+                      {getParticipantTotal(p)}
                     </td>
                     <td className="py-3 px-4 text-center">
                       <span className="text-[10px] uppercase font-bold text-slate-500">
