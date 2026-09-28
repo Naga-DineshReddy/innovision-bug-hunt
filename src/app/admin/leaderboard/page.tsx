@@ -143,7 +143,7 @@ export default function AdminLeaderboardPage() {
               Leaderboard &amp; Certified Standings
             </h1>
             <p className="text-xs text-slate-400 mt-1">
-              Ranked tabulation of all 80 competitors with multi-round score breakdown.
+              Ranked tabulation of all {sorted.length} competitors with multi-round score breakdown.
             </p>
           </div>
 

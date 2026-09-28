@@ -545,7 +545,7 @@ export async function getSubmissions(participantId?: string): Promise<Submission
         .from("submissions")
         .select("*")
         .order("submitted_at", { ascending: false })
-        .limit(100);
+        .limit(500);
 
       if (participantId) {
         query = query.ilike("registration_id", participantId.trim());
