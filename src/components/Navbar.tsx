@@ -46,40 +46,40 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-cyan-500/20 bg-[#060913]/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Left: Brand & Event */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-lg bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-cyan-400 group-hover:border-cyan-400 group-hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all">
-            <Terminal className="w-5 h-5 text-cyan-400" />
+          <div className="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 group-hover:border-cyan-400 group-hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all">
+            <Terminal className="w-5 h-5 text-cyan-600" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs tracking-widest text-cyan-400/80 uppercase font-semibold">
+              <span className="font-mono text-xs tracking-widest text-cyan-700 uppercase font-bold">
                 INNOVISION
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono border border-blue-500/30">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-mono border border-blue-200 font-bold">
                 AI &amp; DS
               </span>
             </div>
-            <span className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-1.5 font-mono">
+            <span className="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5 font-mono">
               BUG HUNT
-              <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="inline-block w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
             </span>
           </div>
         </Link>
 
         {/* Center: Live event details badge (hidden on small screens) */}
-        <div className="hidden md:flex items-center gap-3 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-700/60 text-xs font-mono text-slate-300">
-          <span className="flex items-center gap-1.5 text-cyan-400">
+        <div className="hidden md:flex items-center gap-3 px-3 py-1 rounded-full bg-slate-100/90 border border-slate-200 text-xs font-mono text-slate-700 shadow-sm">
+          <span className="flex items-center gap-1.5 text-cyan-700 font-bold">
             <Cpu className="w-3.5 h-3.5" />
             LAB 4-A
           </span>
-          <span className="text-slate-600">|</span>
-          <span>29-09-2026</span>
-          <span className="text-slate-600">|</span>
-          <span className="text-emerald-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+          <span className="text-slate-300">|</span>
+          <span className="text-slate-600 font-medium">29-09-2026</span>
+          <span className="text-slate-300">|</span>
+          <span className="text-emerald-700 font-bold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
             LIVE PORTAL
           </span>
         </div>
@@ -88,9 +88,9 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <Link
             href="/announcement"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300 hover:text-cyan-300 hover:bg-cyan-950/30 border border-transparent hover:border-cyan-500/30 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-700 hover:text-cyan-700 hover:bg-cyan-50 border border-transparent hover:border-cyan-200 transition-all font-semibold"
           >
-            <Bell className="w-3.5 h-3.5 text-cyan-400" />
+            <Bell className="w-3.5 h-3.5 text-cyan-600" />
             <span className="hidden sm:inline">Announcements</span>
           </Link>
 
