@@ -1,0 +1,1220 @@
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>INNOVISION 2026 — BUG HUNT Technical Documentation</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: "Page " counter(page);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 8pt;
+        color: #94a3b8;
+      }
+      @bottom-left {
+        content: "INNOVISION 2026 — BUG HUNT Engineering Manual";
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 8pt;
+        color: #94a3b8;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.55;
+      color: #1e293b;
+      background: #ffffff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Page Breaks */
+    .page-break {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      min-height: 250mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30mm 15mm 20mm 15mm;
+      background: linear-gradient(145deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%);
+      color: #ffffff;
+      border-radius: 12px;
+      page-break-after: always;
+      break-after: page;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .cover-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(129, 140, 248, 0.4);
+      color: #818cf8;
+      font-size: 9pt;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-radius: 9999px;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 34pt;
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cover-subtitle {
+      font-size: 16pt;
+      font-weight: 400;
+      color: #94a3b8;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .cover-desc {
+      font-size: 11pt;
+      color: #cbd5e1;
+      max-width: 90%;
+      line-height: 1.6;
+      border-left: 3px solid #38bdf8;
+      padding-left: 16px;
+      margin-bottom: 30px;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: auto;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 8pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    h1 {
+      font-size: 20pt;
+      margin-top: 24pt;
+      margin-bottom: 12pt;
+      padding-bottom: 6pt;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 .section-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: #4f46e5;
+      color: #ffffff;
+      font-size: 12pt;
+      border-radius: 6px;
+    }
+
+    h2 {
+      font-size: 13pt;
+      margin-top: 16pt;
+      margin-bottom: 8pt;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      margin-top: 12pt;
+      margin-bottom: 6pt;
+      color: #334155;
+    }
+
+    p {
+      margin-bottom: 10pt;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 12pt;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 4pt;
+    }
+
+    /* Badges & Tags */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-primary { background: #e0e7ff; color: #4338ca; }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger  { background: #fee2e2; color: #b91c1c; }
+    .badge-dark    { background: #1e293b; color: #f8fafc; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10pt;
+      margin-bottom: 14pt;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      padding: 7pt 10pt;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-top: 1px solid #cbd5e1;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    tr:nth-child(even) td {
+      background: #fcfdfe;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      padding: 12pt 14pt;
+      border-radius: 8px;
+      margin: 12pt 0;
+      page-break-inside: avoid;
+      font-size: 9pt;
+      line-height: 1.5;
+    }
+
+    .callout-info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e3a8a;
+    }
+
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #78350f;
+    }
+
+    .callout-security {
+      background: #fdf2f8;
+      border-left: 4px solid #ec4899;
+      color: #831843;
+    }
+
+    .callout-success {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #14532d;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 9.5pt;
+      margin-bottom: 4pt;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Code & Pre */
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 8.5pt;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 8pt;
+      line-height: 1.45;
+      padding: 12pt;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 10pt 0 14pt 0;
+      page-break-inside: avoid;
+      border: 1px solid #1e293b;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+      font-size: inherit;
+    }
+
+    /* Flowcharts & Box Diagrams */
+    .flow-container {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 14pt 0;
+      page-break-inside: avoid;
+    }
+
+    .flow-step {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-top: 3px solid #4f46e5;
+      border-radius: 6px;
+      padding: 10pt 8pt;
+      text-align: center;
+      position: relative;
+    }
+
+    .flow-step-num {
+      display: inline-block;
+      font-size: 7.5pt;
+      font-weight: 800;
+      color: #4f46e5;
+      margin-bottom: 4pt;
+      text-transform: uppercase;
+    }
+
+    .flow-step-title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4pt;
+    }
+
+    .flow-step-desc {
+      font-size: 7.5pt;
+      color: #64748b;
+      line-height: 1.35;
+    }
+
+    /* Grid cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12pt;
+      margin: 10pt 0 14pt 0;
+      page-break-inside: avoid;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10pt;
+      margin: 10pt 0 14pt 0;
+      page-break-inside: avoid;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12pt;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 9.5pt;
+      color: #0f172a;
+      margin-bottom: 4pt;
+    }
+
+    .card-content {
+      font-size: 8.5pt;
+      color: #475569;
+      line-height: 1.45;
+    }
+
+    /* Table of contents */
+    .toc-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6pt 0;
+      border-bottom: 1px dotted #cbd5e1;
+      font-size: 9.5pt;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .toc-page {
+      font-weight: 700;
+      color: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================== -->
+  <!-- COVER PAGE                                 -->
+  <!-- ========================================== -->
+  <div class="cover-page">
+    <div>
+      <div class="cover-badge">Official Engineering & Operations Documentation</div>
+      <div class="cover-title">INNOVISION — BUG HUNT</div>
+      <div class="cover-subtitle">Production System Architecture, Database Design, Anti-Cheat Engine & Coordinator Operations Guide</div>
+      
+      <div class="cover-desc">
+        A real-time, browser-based competitive programming and code debugging platform engineered for high-concurrency collegiate hackathons. Featuring automated test execution, multi-round progression state machines, client surveillance anti-cheat guards, and real-time coordinator command centers.
+      </div>
+    </div>
+
+    <div class="cover-meta-grid">
+      <div class="meta-item">
+        <span class="meta-label">Organizing Department</span>
+        <span class="meta-value">Artificial Intelligence and Data Science</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Event Association</span>
+        <span class="meta-value">INNOVISION Technical Symposium (2026)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Document Version & Date</span>
+        <span class="meta-value">Version 2.0 (Post Security Audit) • October 2026</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Architecture Core</span>
+        <span class="meta-value">Next.js 16 • React 19 • Supabase PostgreSQL • Monaco</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TABLE OF CONTENTS                          -->
+  <!-- ========================================== -->
+  <div class="avoid-break" style="padding-top: 10pt;">
+    <h1><span class="section-num">0</span> Table of Contents</h1>
+    <div style="margin-top: 16pt; margin-bottom: 24pt;">
+      <div class="toc-item"><span class="toc-title">1. Executive Summary & Competition Framework</span><span class="toc-page">Section 1</span></div>
+      <div class="toc-item"><span class="toc-title">2. Complete System Architecture & Technology Stack</span><span class="toc-page">Section 2</span></div>
+      <div class="toc-item"><span class="toc-title">3. Database Schema, Data Models & Row-Level Security (RLS)</span><span class="toc-page">Section 3</span></div>
+      <div class="toc-item"><span class="toc-title">4. Student Experience & Competition Arena Engine</span><span class="toc-page">Section 4</span></div>
+      <div class="toc-item"><span class="toc-title">5. Anti-Cheat Surveillance & Integrity Guard</span><span class="toc-page">Section 5</span></div>
+      <div class="toc-item"><span class="toc-title">6. Administrator Command Center & Round State Machine</span><span class="toc-page">Section 6</span></div>
+      <div class="toc-item"><span class="toc-title">7. Complete API Route & Endpoint Specification</span><span class="toc-page">Section 7</span></div>
+      <div class="toc-item"><span class="toc-title">8. Event Day Operations, Deployment & Emergency Checklist</span><span class="toc-page">Section 8</span></div>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Document Purpose & Confidentiality</div>
+      This document serves as the single source of truth for software engineers, event administrators, lab technicians, and faculty coordinators managing the <strong>INNOVISION — BUG HUNT</strong> platform. It contains database schemas, API contracts, security configurations, and disaster recovery procedures.
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 1: EXECUTIVE SUMMARY               -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">1</span> Executive Summary & Competition Framework</h1>
+  
+  <h2>1.1 Vision & Objectives</h2>
+  <p>
+    <strong>INNOVISION — BUG HUNT</strong> is a high-octane coding contest hosted by the Department of Artificial Intelligence and Data Science. Unlike conventional competitive programming contests where participants write code from scratch, <em>BUG HUNT</em> tests code comprehension, static analysis, logical error identification, and precision debugging under strict time constraints.
+  </p>
+
+  <h2>1.2 Multi-Round Competition Structure</h2>
+  <p>
+    The competition is structured into three progressive rounds totaling 100 marks. Every registered student begins in Round 1 and can qualify forward according to coordinator criteria:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Round</th>
+        <th>Title & Focus</th>
+        <th>Duration</th>
+        <th>Questions</th>
+        <th>Total Marks</th>
+        <th>Default State</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Round 1</strong></td>
+        <td><strong>Easy: Bug Hunt Basics</strong><br><span style="color:#64748b;">Syntax, arithmetic typos, conditional reversals, loop bounds</span></td>
+        <td>10 Minutes</td>
+        <td>8 Questions</td>
+        <td>20 Marks</td>
+        <td><span class="badge badge-success">LIVE</span></td>
+      </tr>
+      <tr>
+        <td><strong>Round 2</strong></td>
+        <td><strong>Moderate: Debugging Challenge</strong><br><span style="color:#64748b;">Array indexing, dictionary lookups, off-by-one errors, recursion bases</span></td>
+        <td>10 Minutes</td>
+        <td>5 Questions</td>
+        <td>30 Marks</td>
+        <td><span class="badge badge-primary">READY</span></td>
+      </tr>
+      <tr>
+        <td><strong>Round 3</strong></td>
+        <td><strong>Hard: Final Bug Hunt</strong><br><span style="color:#64748b;">Algorithmic bugs, sorting, string manipulation, edge-case failure</span></td>
+        <td>10 Minutes</td>
+        <td>3 Questions</td>
+        <td>50 Marks</td>
+        <td><span class="badge badge-warning">FINALISTS</span></td>
+      </tr>
+      <tr style="font-weight: 700; background: #f1f5f9;">
+        <td colspan="2">TOTAL COMPETITION METRICS</td>
+        <td>30 Minutes</td>
+        <td>16 Questions</td>
+        <td>100 Marks</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>1.3 Scoring Rules & Deterministic Tie-Breaker Algorithm</h2>
+  <p>
+    In high-stakes hackathons, ties often occur when contestants solve identical questions. The platform evaluates contestants and sorts the real-time leaderboard using an automated 4-tier tie-breaking algorithm:
+  </p>
+
+  <div class="flow-container">
+    <div class="flow-step">
+      <span class="flow-step-num">Criterion 1</span>
+      <div class="flow-step-title">Total Score</div>
+      <div class="flow-step-desc">Aggregate score across all rounds (Max 100). Primary rank order.</div>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">Criterion 2</span>
+      <div class="flow-step-title">Round 3 Score</div>
+      <div class="flow-step-desc">Performance on hardest algorithmic challenges (Max 50).</div>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">Criterion 3</span>
+      <div class="flow-step-title">Round 2 Score</div>
+      <div class="flow-step-desc">Performance on intermediate debugging challenges (Max 30).</div>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">Criterion 4</span>
+      <div class="flow-step-title">Earliest Submission</div>
+      <div class="flow-step-desc">Contestant who submitted solutions earliest in UTC timestamp.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 2: SYSTEM ARCHITECTURE             -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">2</span> System Architecture & Technology Stack</h1>
+
+  <h2>2.1 High-Level Architecture Overview</h2>
+  <p>
+    The platform is built as a cloud-native, server-rendered and client-hydrated application leveraging Next.js 16 App Router, TypeScript, and Supabase PostgreSQL.
+  </p>
+
+  <div class="card avoid-break" style="margin-bottom: 14pt;">
+    <div class="card-title">Architecture Pipeline</div>
+    <pre><code>[ Participant Web Browser ]
+      │
+      ├── (1) HTTPS Student Session Cookie (HTTP-Only)
+      ├── (2) Anti-Cheat Surveillance Signals (POST /api/student/anti-cheat)
+      ├── (3) Monaco Code Editor (Browser WASM / WebWorker)
+      │
+[ Next.js 16 Application Server (Vercel / Node.js) ]
+      │
+      ├── Route Handlers & Anti-Cheat Ingestion Engine
+      ├── Automated Test Case Evaluator (Input/Output assertion)
+      ├── Session Management & JWT Token Generator
+      │
+      └── Privileged Supabase Admin Client (SUPABASE_SERVICE_ROLE_KEY)
+            │
+[ Supabase PostgreSQL 15 Cloud Database ]
+      ├── public.registrations & public.registration_members
+      ├── public.participant_sessions (State & Live Scores)
+      ├── public.submissions (Code snapshots & Test outputs)
+      ├── public.competition_settings & public.rounds
+      ├── public.audit_logs (Tamper-proof compliance log)
+      └── Row Level Security (RLS) Active Policies</code></pre>
+  </div>
+
+  <h2>2.2 Core Technology Stack Components</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Frontend & UI Engine</div>
+      <div class="card-content">
+        <ul>
+          <li><strong>Next.js 16.3.6 (App Router):</strong> High-performance server rendering and streaming.</li>
+          <li><strong>React 19.2.8:</strong> Latest React concurrency features and state primitives.</li>
+          <li><strong>Tailwind CSS 4:</strong> Zero-runtime styling with custom cyber dark-mode palette.</li>
+          <li><strong>Monaco Editor (@monaco-editor/react 4.7):</strong> Industrial-grade VS Code editor inside the browser.</li>
+          <li><strong>Lucide Icons & Canvas Confetti:</strong> Interactive visual feedback and status badges.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Backend & Database Infrastructure</div>
+      <div class="card-content">
+        <ul>
+          <li><strong>Supabase PostgreSQL:</strong> Managed ACID database with connection pooling.</li>
+          <li><strong>Row Level Security (RLS):</strong> Cryptographically enforced table isolation.</li>
+          <li><strong>Service Role Key:</strong> Elevated server-only privileges bypassing public restrictions.</li>
+          <li><strong>Cookie & JWT Authentication:</strong> Tamper-proof session validation for students and coordinators.</li>
+          <li><strong>In-Memory Resilient Fallback:</strong> Zero-downtime offline support if cloud connectivity hiccups.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>2.3 Dual-Engine Data Persistence (Hybrid Resilience)</h2>
+  <p>
+    To ensure zero event disruption during high-stress collegiate lab conditions (e.g., intermittent Wi-Fi or firewall blocks), the application employs a <strong>Hybrid Persistence Architecture</strong> (in <code>src/lib/store.ts</code>):
+  </p>
+  <ul>
+    <li><strong>Primary Engine:</strong> Cloud Supabase database queried via <code>supabaseAdmin</code> with transaction integrity.</li>
+    <li><strong>Fallback Engine:</strong> In-memory and static verified seed datasets (<code>src/data/participants.ts</code>, <code>src/data/questions.ts</code>). If Supabase credentials are unset or the network fails, the system seamlessly handles registrations and test scoring in memory without crashing.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 3: DATABASE SCHEMA & SECURITY      -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">3</span> Database Schema, Data Models & Row-Level Security</h1>
+
+  <h2>3.1 Relational Schema Architecture</h2>
+  <p>
+    The platform's relational model in Supabase PostgreSQL (defined in <code>supabase/schema.sql</code>) consists of 8 core tables:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Table Name</th>
+        <th>Primary Key</th>
+        <th>Foreign Keys / Indexes</th>
+        <th>Description & Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>registrations</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>registration_id (UNIQUE)</code></td>
+        <td>Stores approved participant details synced with INNOVISION master database.</td>
+      </tr>
+      <tr>
+        <td><code>registration_members</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>registration_id -> registrations</code></td>
+        <td>Supports team members and full student profile metadata.</td>
+      </tr>
+      <tr>
+        <td><code>participant_sessions</code></td>
+        <td><code>registration_id (VARCHAR)</code></td>
+        <td><code>registration_id -> registrations</code></td>
+        <td>Maintains live state, start/submit timestamps, scores (R1, R2, R3), finalist flag.</td>
+      </tr>
+      <tr>
+        <td><code>submissions</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>registration_id</code>, <code>question_id</code></td>
+        <td>Stores every code attempt, passed test counts, score, and execution duration.</td>
+      </tr>
+      <tr>
+        <td><code>competition_settings</code></td>
+        <td><code>id (VARCHAR)</code></td>
+        <td>Primary: <code>main_settings</code></td>
+        <td>Global configuration: tab limits, copy-paste flags, announcements, rules.</td>
+      </tr>
+      <tr>
+        <td><code>rounds</code></td>
+        <td><code>round_number (INT)</code></td>
+        <td>Values: 1, 2, 3</td>
+        <td>Round states (LOCKED, READY, LIVE, PAUSED, COMPLETED), durations, marks.</td>
+      </tr>
+      <tr>
+        <td><code>questions</code></td>
+        <td><code>id (VARCHAR)</code></td>
+        <td><code>round_id -> rounds</code></td>
+        <td>Buggy code, hidden/visible test cases, explanations, marks, languages.</td>
+      </tr>
+      <tr>
+        <td><code>audit_logs</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>registration_id</code>, <code>event_type</code></td>
+        <td>Immutable anti-cheat trail (tab switches, paste attempts, blur events).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3.2 Row-Level Security (RLS) & Threat Mitigation</h2>
+  
+  <div class="callout callout-security">
+    <div class="callout-title">Threat Model & Vulnerability Resolution (rls_disabled_in_public)</div>
+    Because client-side web applications expose <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code>, having tables with RLS disabled allows any tech-savvy participant to craft POST/DELETE requests using DevTools to overwrite competitor scores or delete questions.<br>
+    <strong>Enforced Mitigation:</strong> RLS is strictly enabled across all tables. The public anonymous role is restricted to reading public settings and round statuses. All mutations, score writes, and participant updates are locked down exclusively to the server-side <code>service_role</code> key.
+  </div>
+
+  <pre><code>-- Production Security Configuration
+ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.registration_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.participant_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.competition_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.rounds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Anonymous users can strictly read public contest metadata
+CREATE POLICY "Public can view settings" ON public.competition_settings FOR SELECT USING (true);
+CREATE POLICY "Public can view rounds" ON public.rounds FOR SELECT USING (true);
+
+-- Backend API operations utilize the privileged service role (auth.role() = 'service_role')</code></pre>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 4: STUDENT EXPERIENCE & ARENA      -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">4</span> Student Experience & Competition Arena Engine</h1>
+
+  <h2>4.1 End-to-End Contestant Journey</h2>
+  <div class="flow-container">
+    <div class="flow-step">
+      <span class="flow-step-num">Step 1</span>
+      <div class="flow-step-title">Portal Entry & Login</div>
+      <div class="flow-step-desc">Student inputs registration ID (e.g., <code>INV-2026-00098</code>). Instant verification.</div>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">Step 2</span>
+      <div class="flow-step-title">Round Initialization</div>
+      <div class="flow-step-desc">Deadline timestamp created in database. Anti-cheat listeners activate.</div>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">Step 3</span>
+      <div class="flow-step-title">Monaco Bug Hunt</div>
+      <div class="flow-step-desc">Code inspection, syntax editing, running test cases, immediate test assertions.</div>
+    </div>
+    <div class="flow-step">
+      <span class="flow-step-num">Step 4</span>
+      <div class="flow-step-title">Round Auto-Submit</div>
+      <div class="flow-step-desc">Graceful completion or timer timeout auto-submits. Advances to next round.</div>
+    </div>
+  </div>
+
+  <h2>4.2 Competition Arena Components</h2>
+  <p>
+    The competition arena (<code>src/components/CompetitionArena.tsx</code>) provides a responsive, IDE-like interface tailored for fast debugging:
+  </p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Live Synchronized Countdown Timer</div>
+      <div class="card-content">
+        Calculated from server-stored <code>round_deadline_at</code>. Prevents client device clock manipulation. When timer hits zero, the arena disallows further keystrokes and automatically invokes the submission pipeline.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Question Navigator Matrix</div>
+      <div class="card-content">
+        Color-coded badge matrix allowing non-linear question navigation (when allowed by settings). Questions transition between <code>UNATTEMPTED</code> (slate), <code>CURRENT</code> (indigo ring), and <code>SUBMITTED / CORRECT</code> (emerald).
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monaco Code Editor Canvas</div>
+      <div class="card-content">
+        Full syntax highlighting, bracket matching, line numbers, and error diagnostics for Python. Contestants can revert accidental changes via "Reset to Starter Code" button.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Test Runner & Feedback Console</div>
+      <div class="card-content">
+        Dual test case strategy: Visible test cases showcase inputs and expected vs actual outputs. Hidden test cases evaluate edge boundaries to prevent hardcoded print statements.
+      </div>
+    </div>
+  </div>
+
+  <h2>4.3 Automated Evaluation & Submission Engine</h2>
+  <p>
+    When a student clicks <strong>"Submit Solution"</strong>, the payload is transmitted to <code>/api/student/submit</code>:
+  </p>
+  <ul>
+    <li>The server evaluates the submitted code against all test cases associated with the question.</li>
+    <li>Score is calculated proportionally: <code>(passed_cases / total_cases) * question.marks</code>.</li>
+    <li>A permanent snapshot is recorded in <code>submissions</code> with timestamp and output logs.</li>
+    <li>The student's round total is dynamically recalculated and updated in <code>participant_sessions</code>.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 5: ANTI-CHEAT SURVEILLANCE         -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">5</span> Anti-Cheat Surveillance & Integrity Guard</h1>
+
+  <h2>5.1 Multi-Vector Integrity Protection</h2>
+  <p>
+    To preserve competitive fairness in computer lab environments, the application embeds an active anti-cheat sentinel (<code>src/components/AntiCheatGuard.tsx</code>) running client-side event loops:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Surveillance Vector</th>
+        <th>Detection Mechanism</th>
+        <th>Action Taken</th>
+        <th>Logged Event Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Tab / Window Switching</strong></td>
+        <td><code>document.visibilitychange</code> &amp; <code>document.hidden</code></td>
+        <td>Triggers visual compliance warning; increments violation tally.</td>
+        <td><code>TAB_SWITCH</code></td>
+      </tr>
+      <tr>
+        <td><strong>Focus Loss (Window Blur)</strong></td>
+        <td><code>window.addEventListener("blur")</code></td>
+        <td>Detects split-screen or external messaging applications.</td>
+        <td><code>BLUR</code></td>
+      </tr>
+      <tr>
+        <td><strong>Clipboard Paste Attempt</strong></td>
+        <td><code>clipboard.addEventListener("paste")</code></td>
+        <td>Intercepts paste event (<code>e.preventDefault()</code>); blocks external code insertion.</td>
+        <td><code>PASTE_ATTEMPT</code></td>
+      </tr>
+      <tr>
+        <td><strong>Fullscreen Exit</strong></td>
+        <td><code>document.fullscreenElement</code></td>
+        <td>Alerts student to re-enter fullscreen mode immediately.</td>
+        <td><code>FULLSCREEN_EXIT</code></td>
+      </tr>
+      <tr>
+        <td><strong>Developer Tools Opening</strong></td>
+        <td>Window resize threshold analysis</td>
+        <td>Prevents inspection of source code and client variables.</td>
+        <td><code>DEVTOOLS</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5.2 Violation Thresholds & Enforcement</h2>
+  <p>
+    Every detected violation fires an asynchronous beacon to <code>/api/student/anti-cheat</code>:
+  </p>
+  <ul>
+    <li>The violation is appended to the immutable <code>audit_logs</code> table with student registration ID, timestamp, and context details.</li>
+    <li>The participant's <code>suspicious_count</code> in <code>participant_sessions</code> is incremented.</li>
+    <li>If <code>suspicious_count &gt;= tab_switch_limit</code> (configured in settings, default: 3), the server can flag the session for coordinator review or set status to <code>DISQUALIFIED / LOCKED</code>.</li>
+    <li>Coordinators can view real-time anti-cheat alerts directly on the live Admin Dashboard.</li>
+  </ul>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">Coordinator Discretion & Manual Unlocking</div>
+    Network fluctuations or accidental desktop notifications can occasionally cause focus blur. The platform therefore provides an <strong>Admin Unlock / Reset</strong> function in the coordinator panel to reinstate accidentally locked students.
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 6: ADMIN COMMAND CENTER            -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">6</span> Administrator Command Center & Operations</h1>
+
+  <h2>6.1 Admin Portal Capabilities</h2>
+  <p>
+    The coordinator interface (accessible at <code>/admin/dashboard</code>) provides complete authority over the event lifecycle through 9 specialized command views:
+  </p>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Live Telemetry Dashboard</div>
+      <div class="card-content">Real-time counts of logged-in students, active submissions, average scores, and live anti-cheat incident feeds.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Participant Manager</div>
+      <div class="card-content">Filter contestants by round, view scores, inspect IP addresses, reset sessions, or flag disqualifications.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Round State Controller</div>
+      <div class="card-content">Execute state transitions across Round 1, 2, and 3: <code>LOCKED</code>, <code>READY</code>, <code>LIVE</code>, <code>PAUSED</code>, <code>COMPLETED</code>.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Finalist Selection Engine</div>
+      <div class="card-content">Filter top contestants after Round 2 based on cumulative score cutoffs and promote them to Round 3.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Submissions Inspector</div>
+      <div class="card-content">Browse every code submission by question, view exact code diffs, execution times, and test outputs.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Dynamic Leaderboard</div>
+      <div class="card-content">Real-time ranked board with tie-breaker calculations. Can be made public or kept hidden until awards.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Question Bank Repository</div>
+      <div class="card-content">Browse all 16 competition questions, view buggy code, canonical solutions, and hidden test vectors.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Contest Settings</div>
+      <div class="card-content">Configure anti-cheat strictness, navigation policies, copy-paste flags, and tie-breaker strings.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Live Announcement Broadcaster</div>
+      <div class="card-content">Push emergency or informational broadcast banners to all student competition screens instantly.</div>
+    </div>
+  </div>
+
+  <h2>6.2 Round State Machine Workflow</h2>
+  <p>
+    Coordinators transition rounds sequentially through the following state lifecycle:
+  </p>
+  <pre><code>[ LOCKED ] ──────> [ READY ] ──────> [ LIVE ] <────> [ PAUSED ]
+                                        │
+                                        ▼
+                                  [ COMPLETED ]</code></pre>
+  <ul>
+    <li><strong>LOCKED:</strong> Students cannot access questions or view starter code.</li>
+    <li><strong>READY:</strong> Round is queued. Contestants see a "Get Ready" countdown screen.</li>
+    <li><strong>LIVE:</strong> Countdown clock ticks down. Editor is unlocked and active. Submissions accepted.</li>
+    <li><strong>PAUSED:</strong> Coordinators freeze timers across all stations for announcements or lab issues.</li>
+    <li><strong>COMPLETED:</strong> Round closes. All unsubmitted work auto-evaluates. Finalist selection unlocks.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 7: API ROUTE SPECIFICATION         -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">7</span> Complete API Route & Endpoint Specification</h1>
+
+  <p>All endpoints accept and return <code>application/json</code>. Authentication is validated via HTTP-only cookies or bearer headers.</p>
+
+  <h2>7.1 Student API Endpoints</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Method &amp; Path</th>
+        <th>Auth</th>
+        <th>Request Payload</th>
+        <th>Response Payload</th>
+        <th>Function</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>POST /api/student/verify</code></td>
+        <td>Public</td>
+        <td><code>{ registrationId: string }</code></td>
+        <td><code>{ success: boolean, participant: Participant }</code></td>
+        <td>Validates ID, initiates session cookie, and returns student profile.</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/student/round-session</code></td>
+        <td>Student Cookie</td>
+        <td><code>Query: ?round=1</code></td>
+        <td><code>{ activeRound, deadline, questions, status }</code></td>
+        <td>Returns active round parameters and questions (solution stripped).</td>
+      </tr>
+      <tr>
+        <td><code>POST /api/student/submit</code></td>
+        <td>Student Cookie</td>
+        <td><code>{ questionId, code, roundId }</code></td>
+        <td><code>{ score, testsPassed, totalTests, results }</code></td>
+        <td>Evaluates code, updates round scores, records submission snapshot.</td>
+      </tr>
+      <tr>
+        <td><code>POST /api/student/anti-cheat</code></td>
+        <td>Student Cookie</td>
+        <td><code>{ eventType, details }</code></td>
+        <td><code>{ success, suspiciousCount, warning }</code></td>
+        <td>Logs compliance events to <code>audit_logs</code>; increments violation count.</td>
+      </tr>
+      <tr>
+        <td><code>POST /api/student/complete-round</code></td>
+        <td>Student Cookie</td>
+        <td><code>{ roundNumber: number }</code></td>
+        <td><code>{ success, nextRoundUnlocked, totalScore }</code></td>
+        <td>Marks round as completed and handles transition to subsequent round.</td>
+      </tr>
+      <tr>
+        <td><code>POST /api/student/logout</code></td>
+        <td>Student Cookie</td>
+        <td>—</td>
+        <td><code>{ success: true }</code></td>
+        <td>Clears student session cookies and ends active tracking.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>7.2 Administrator API Endpoints</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Method &amp; Path</th>
+        <th>Auth</th>
+        <th>Payload / Parameters</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>POST /api/admin/login</code></td>
+        <td>Public</td>
+        <td><code>{ email, password }</code></td>
+        <td>Validates admin credentials, issues signed JWT session cookie.</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/admin/dashboard/stats</code></td>
+        <td>Admin Cookie</td>
+        <td>—</td>
+        <td>Returns total registered, active contestants, average scores, live audit feed.</td>
+      </tr>
+      <tr>
+        <td><code>GET/POST /api/admin/participants</code></td>
+        <td>Admin Cookie</td>
+        <td>Action: <code>reset</code>, <code>unlock</code>, <code>disqualify</code></td>
+        <td>Retrieves participant roster or updates participant operational status.</td>
+      </tr>
+      <tr>
+        <td><code>GET/POST /api/admin/rounds</code></td>
+        <td>Admin Cookie</td>
+        <td><code>{ roundNumber, status, duration }</code></td>
+        <td>Updates round state machine (e.g., transitions Round 1 to COMPLETED).</td>
+      </tr>
+      <tr>
+        <td><code>GET/POST /api/admin/finalists</code></td>
+        <td>Admin Cookie</td>
+        <td><code>{ registrationIds: string[] }</code></td>
+        <td>Promotes qualified students to finalist tier for Round 3 access.</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/admin/submissions</code></td>
+        <td>Admin Cookie</td>
+        <td><code>Query: ?questionId=&amp;round=</code></td>
+        <td>Fetches raw submitted code and test outputs across contestants.</td>
+      </tr>
+      <tr>
+        <td><code>GET/POST /api/admin/settings</code></td>
+        <td>Admin Cookie</td>
+        <td><code>CompetitionSettings</code> object</td>
+        <td>Reads or updates global rules, tab limits, copy-paste permissions.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================== -->
+  <!-- SECTION 8: EVENT DAY OPERATIONS GUIDE      -->
+  <!-- ========================================== -->
+  <h1><span class="section-num">8</span> Event Day Operations, Deployment & Checklist</h1>
+
+  <h2>8.1 Pre-Flight Environment Variables Reference (<code>.env.local</code>)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Variable Key</th>
+        <th>Scope</th>
+        <th>Description & Expected Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>NEXT_PUBLIC_SUPABASE_URL</code></td>
+        <td>Public / Client</td>
+        <td>Project HTTPS URL (e.g., <code>https://yduwzfzdugtdlrkreagr.supabase.co</code>)</td>
+      </tr>
+      <tr>
+        <td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td>
+        <td>Public / Client</td>
+        <td>Supabase Anon key (read-restricted by RLS policies).</td>
+      </tr>
+      <tr>
+        <td><code>SUPABASE_SERVICE_ROLE_KEY</code></td>
+        <td>Server Only</td>
+        <td>Privileged Service Role Secret bypassing RLS for backend routes.</td>
+      </tr>
+      <tr>
+        <td><code>ADMIN_EMAIL</code></td>
+        <td>Server Only</td>
+        <td>Master coordinator login email (e.g., <code>dineshh2519@gmail.com</code>).</td>
+      </tr>
+      <tr>
+        <td><code>ADMIN_PASSWORD</code></td>
+        <td>Server Only</td>
+        <td>Encrypted or secure coordinator portal access password.</td>
+      </tr>
+      <tr>
+        <td><code>ADMIN_JWT_SECRET</code></td>
+        <td>Server Only</td>
+        <td>High-entropy cryptographic key used for signing coordinator JWT tokens.</td>
+      </tr>
+      <tr>
+        <td><code>STUDENT_SESSION_SECRET</code></td>
+        <td>Server Only</td>
+        <td>Secret key for encrypting participant session cookies.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8.2 Coordinator Event Day Protocol & Timeline</h2>
+  
+  <div class="card avoid-break" style="margin-bottom: 12pt;">
+    <div class="card-title">T-minus 60 Minutes (Lab & Infrastructure Verification)</div>
+    <div class="card-content">
+      <ul>
+        <li>Launch the web server using <code>npm run build &amp;&amp; npm run start</code> or verify cloud deployment URL.</li>
+        <li>Login to Coordinator Command Center (<code>/admin/login</code>) and ensure dashboard metrics load.</li>
+        <li>Verify all lab client PCs can load the home page and resolve DNS.</li>
+        <li>Confirm Supabase connection status shows <strong>Connected (Cloud Mode)</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card avoid-break" style="margin-bottom: 12pt;">
+    <div class="card-title">T-minus 10 Minutes (Contestant Seating & Briefing)</div>
+    <div class="card-content">
+      <ul>
+        <li>Direct participants to the login page (<code>/login</code>) and instruct them to enter their assigned ID.</li>
+        <li>Ensure Round 1 is set to <span class="badge badge-primary">READY</span> status.</li>
+        <li>Brief students on anti-cheat protocols: <em>"Tab switches, window blurs, and paste attempts are automatically logged and will disqualify after 3 strikes."</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card avoid-break" style="margin-bottom: 12pt;">
+    <div class="card-title">Event Execution (Rounds 1, 2, and 3)</div>
+    <div class="card-content">
+      <ul>
+        <li><strong>3:00 PM:</strong> Coordinator sets Round 1 to <span class="badge badge-success">LIVE</span>. Arena countdown begins.</li>
+        <li><strong>3:10 PM:</strong> Round 1 closes. Review leaderboard. Transition Round 2 to <span class="badge badge-success">LIVE</span>.</li>
+        <li><strong>3:20 PM:</strong> Round 2 closes. Navigate to <code>/admin/finalists</code>. Select top qualifying students for Round 3.</li>
+        <li><strong>3:30 PM:</strong> Round 3 (Finals) set to <span class="badge badge-warning">LIVE</span>. Finalists compete for the championship.</li>
+        <li><strong>3:40 PM:</strong> Competition finishes. Leaderboard exported for valedictory ceremony.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>8.3 Disaster Recovery FAQ</h2>
+  <div class="callout callout-info">
+    <strong>Q: What if a lab PC crashes or the student accidentally closes their browser?</strong><br>
+    <strong>A:</strong> All submissions, scores, and active round deadlines are stored in Supabase PostgreSQL. The student simply re-opens the browser, types their registration ID at <code>/login</code>, and their exact session and scores will be restored instantly.
+  </div>
+
+  <div class="callout callout-info">
+    <strong>Q: What if a student is locked out due to accidental popups or antivirus notifications?</strong><br>
+    <strong>A:</strong> The coordinator can navigate to <strong>Admin &gt; Participants</strong>, search for the student's Registration ID, and click <strong>"Unlock Session"</strong> or <strong>"Reset Strikes"</strong> to immediately re-enable their editor.
+  </div>
+
+  <div style="margin-top: 30pt; padding-top: 15pt; border-top: 1px solid #cbd5e1; text-align: center; color: #94a3b8; font-size: 8.5pt;">
+    Department of Artificial Intelligence and Data Science • INNOVISION 2026 • BUG HUNT Platform
+  </div>
+
+</body>
+</html>
+`;
+
+// 1. Write HTML file to scratch/temp directory
+const htmlPath = path.join(__dirname, "documentation.html");
+fs.writeFileSync(htmlPath, htmlContent, "utf8");
+console.log("HTML Documentation created at:", htmlPath);
+
+// 2. Generate PDF via Headless Chrome
+const outputPdfPath = path.resolve(__dirname, "..", "INNOVISION_BUG_HUNT_2026_DOCUMENTATION.pdf");
+const chromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+
+const chromeCmd = `"${chromePath}" --headless=new --disable-gpu --no-pdf-header-footer --print-to-pdf="${outputPdfPath}" "file://${htmlPath}"`;
+
+console.log("Executing Chrome PDF conversion...");
+try {
+  execSync(chromeCmd, { stdio: "inherit" });
+  if (fs.existsSync(outputPdfPath)) {
+    const stats = fs.statSync(outputPdfPath);
+    console.log(`SUCCESS! PDF generated successfully: ${outputPdfPath} (${(stats.size / 1024).toFixed(1)} KB)`);
+  } else {
+    console.error("PDF generation command executed but output file not found!");
+  }
+} catch (err) {
+  console.error("Error executing Chrome headless command:", err.message);
+}
